@@ -5,18 +5,19 @@ export type CardOrigin = {
 };
 
 export class Game {
-  public _guards: Card[] | undefined[] = [
+  private _guards: Card[] | undefined[] = [
     undefined,
     undefined,
     undefined,
     undefined,
   ];
-  public _piles: Card[][] = [[], [], [], []];
-  public _columns: Card[][] = [[], [], [], [], [], [], [], []];
-  public _deck: Deck;
+  private _piles: Card[][] = [[], [], [], []];
+  private _columns: Card[][] = [[], [], [], [], [], [], [], []];
+  private _deck: Deck;
 
   constructor(deck: Deck) {
     this._deck = deck;
+    this.resetGame();
   }
 
   resetGame() {
@@ -28,6 +29,7 @@ export class Game {
         if (card) this._columns[i].push(card);
       }
     }
+    console.log('na classe',this._columns)
   }
 
   moveFromColumnToGuard(card: Card, guardIndex: number): boolean {
@@ -87,4 +89,33 @@ export class Game {
     }
     return true;
   }
+
+  getColumns(): Card[][] {
+    return this._columns;
+  }
+
+  getPiles(): Card[][] {
+    return this._piles;
+  }
+
+  getGuards(): (Card | undefined)[] {
+    return this._guards;
+  }
+
+  getColumn(index: number): Card[] {
+    return this._columns[index];
+  }  
+  
+  getPile(index: number): Card[] {
+    return this._piles[index];
+  }
+
+  getGuard(index: number): Card | undefined {
+    return this._guards[index];
+  }
+
+  getDeck(): Deck {
+    return this._deck
+  }
+
 }

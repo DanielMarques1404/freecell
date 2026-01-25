@@ -1,12 +1,12 @@
 import "./App.css";
-import { DeckProvider } from "./app/context/DeckContext";
+import { GameProvider } from "./app/context/GameContext";
 import { AppContent } from "./AppContent";
 
 function App() {
   return (
-    <DeckProvider>
+    <GameProvider>
       <AppContent />
-    </DeckProvider>
+    </GameProvider>
   );
 }
 
