@@ -1,14 +1,10 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { Deck } from "../../core/domain/entities/card";
 import { Game } from "../../core/domain/entities/game";
 
 type GameContextType = {
-  game: Game
+  game: Game;
+  setGame: (game: Game) => void;
 };
 
 export const GameContext = createContext<GameContextType | undefined>(
@@ -16,10 +12,10 @@ export const GameContext = createContext<GameContextType | undefined>(
 );
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
-  const [game, _] = useState<Game>(new Game(new Deck(true, false)));
+  const [game, setGame] = useState<Game>(new Game(new Deck(true, false)));
 
   return (
-    <GameContext.Provider value={{ game }}>
+    <GameContext.Provider value={{ game, setGame }}>
       {children}
     </GameContext.Provider>
   );

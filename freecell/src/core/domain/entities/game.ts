@@ -5,6 +5,8 @@ export type CardOrigin = {
 };
 
 export class Game {
+  readonly MAX_GUARDS = 4;
+
   private _guards: Card[] | undefined[] = [
     undefined,
     undefined,
@@ -29,16 +31,19 @@ export class Game {
         if (card) this._columns[i].push(card);
       }
     }
-    console.log('na classe',this._columns)
   }
 
-  moveFromColumnToGuard(card: Card, guardIndex: number): boolean {
-    if (this._guards[guardIndex] !== undefined) {
-      return false;
-    }
-    if (guardIndex < 0 || guardIndex > 3) return false;
+  moveFromColumnToGuard(card: Card): boolean {
+    const guardIndex = this._guards.findIndex((guard) => guard === undefined);
+    if (guardIndex === -1) return false;
 
     this._guards[guardIndex] = card;
+    this.removeFromColumns(card);
+
+    return true;
+  }
+
+  private removeFromColumns(card: Card) {
     for (let i = 0; i < this._columns.length; i++) {
       const cardIndex = this._columns[i].indexOf(card);
       if (cardIndex !== -1) {
@@ -46,32 +51,24 @@ export class Game {
         break;
       }
     }
-    
-    return true;
   }
 
-  moveFromColumnToPile(card: Card, pileIndex: number): boolean {
-    const pile = this._piles[pileIndex];
-
-    if (pile.length > 0 && pile[0].suit !== card.suit) {
-      return false;
+  moveFromColumnToPile(card: Card): boolean {
+    let pileIndex = this._piles.findIndex((pile) => pile.length > 0 && pile[0].suit === card.suit);
+    
+    if (pileIndex === -1) {
+      if (card.rank != 1) return false;
+      pileIndex = this._piles.findIndex((pile) => pile.length === 0);
     }
+      
+    const pile = this._piles[pileIndex];
 
     if (pile.length > 0 && card.compareTo(pile[pile.length - 1]) > 1) {
       return false;
     }
 
-    // Adiciona à pilha
     pile.push(card);
-
-    // Remove da coluna
-    for (let i = 0; i < this._columns.length; i++) {
-      const cardIndex = this._columns[i].indexOf(card);
-      if (cardIndex !== -1) {
-        this._columns[i].splice(cardIndex, 1);
-        break;
-      }
-    }
+    this.removeFromColumns(card);
 
     return true;
   }
@@ -104,8 +101,8 @@ export class Game {
 
   getColumn(index: number): Card[] {
     return this._columns[index];
-  }  
-  
+  }
+
   getPile(index: number): Card[] {
     return this._piles[index];
   }
@@ -115,7 +112,15 @@ export class Game {
   }
 
   getDeck(): Deck {
-    return this._deck
+    return this._deck;
   }
 
+  copy(): Game {
+    const copiedGame = Object.create(Game.prototype);
+    copiedGame._deck = this._deck;
+    copiedGame._guards = [...this._guards];
+    copiedGame._piles = this._piles.map((pile) => [...pile]);
+    copiedGame._columns = this._columns.map((column) => [...column]);
+    return copiedGame;
+  }
 }

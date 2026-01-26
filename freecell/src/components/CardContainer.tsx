@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import type { Card } from "../core/domain/entities/card";
 import { CardImage } from "./Card";
 
@@ -7,6 +8,12 @@ type CardContainerProps = {
 };
 
 export const CardContainer = ({ color, cards }: CardContainerProps) => {
+  const [localCards, setLocalCards] = useState<Card[] | undefined>(cards);
+
+  useEffect(() => {
+    setLocalCards(cards)
+  }, [cards])
+
   const bgColor =
     color === "light"
       ? "border-gray-400 border-4 rounded-2xl"
@@ -19,8 +26,8 @@ export const CardContainer = ({ color, cards }: CardContainerProps) => {
       className={`relative flex items-center justify-center w-32 h-48 p-1 ${bgColor}`}
     >
       <ul>
-        {cards &&
-          cards.map((card, index) => (
+        {localCards &&
+          localCards.map((card, index) => (
             <li
               className="absolute flex items-center justify-center p-1 left-0"
               style={{ top: `${index * 36}px` }}
