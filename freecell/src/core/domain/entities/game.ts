@@ -53,19 +53,37 @@ export class Game {
     }
   }
 
-  moveFromColumnToPile(card: Card): boolean {
-    let pileIndex = this._piles.findIndex((pile) => pile.length > 0 && pile[0].suit === card.suit);
-    
+  private removeFromGuard(card: Card) {
+    for (let i = 0; i < this._guards.length; i++) {
+      if (this._guards[i] && this._guards[i]!.equals(card)) {
+        this._guards[i] = undefined;
+        break;
+      }
+    }
+  }
+
+  getPileToMove(card: Card): Card[] | null {
+    let pileIndex = this._piles.findIndex(
+      (pile) => pile.length > 0 && pile[0].suit === card.suit,
+    );
+
     if (pileIndex === -1) {
-      if (card.rank != 1) return false;
+      if (card.rank != 1) return null;
       pileIndex = this._piles.findIndex((pile) => pile.length === 0);
     }
-      
+
     const pile = this._piles[pileIndex];
 
     if (pile.length > 0 && card.compareTo(pile[pile.length - 1]) > 1) {
-      return false;
+      return null;
     }
+
+    return pile;
+  }
+
+  moveFromColumnToPile(card: Card): boolean {
+    const pile = this.getPileToMove(card);
+    if (!pile) return false;
 
     pile.push(card);
     this.removeFromColumns(card);
@@ -78,12 +96,17 @@ export class Game {
       return false;
     }
     this._columns[columnIndex].push(card);
-    for (let i = 0; i < this._guards.length; i++) {
-      if (this._guards[i] === card) {
-        this._guards[i] = undefined;
-        break;
-      }
-    }
+    this.removeFromGuard(card);
+    return true;
+  }
+
+  moveFromGuardToPile(card: Card): boolean {
+    const pile = this.getPileToMove(card);
+    if (!pile) return false;
+
+    pile.push(card);
+    this.removeFromGuard(card);
+
     return true;
   }
 

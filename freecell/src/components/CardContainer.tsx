@@ -4,10 +4,12 @@ import { CardImage } from "./Card";
 
 type CardContainerProps = {
   color: "light" | "dark" | "";
+  over?: boolean;
   cards?: Card[];
+  onclick?: (card: Card) => void;
 };
 
-export const CardContainer = ({ color, cards }: CardContainerProps) => {
+export const CardContainer = ({ color, over = false, cards, onclick }: CardContainerProps) => {
   const [localCards, setLocalCards] = useState<Card[] | undefined>(cards);
 
   useEffect(() => {
@@ -30,11 +32,11 @@ export const CardContainer = ({ color, cards }: CardContainerProps) => {
           localCards.map((card, index) => (
             <li
               className="absolute flex items-center justify-center p-1 left-0"
-              style={{ top: `${index * 36}px` }}
+              style={{ top: `${over ? 0 : index * 36}px` }}
               key={index}
               draggable={true}
             >
-              <CardImage card={card} />
+              <CardImage card={card} onclick={onclick && onclick} />
             </li>
           ))}
       </ul>

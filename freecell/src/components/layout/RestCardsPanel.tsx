@@ -18,7 +18,7 @@ export const RestCardsPanel = () => {
       </div>
       <div className="flex gap-2">
         {game.getPiles().map((card, index) => (
-          <CardContainer key={index} cards={card ? card : []} color={"light"} />
+          <CardContainer key={index} cards={card ? card : []} color={"light"} over />
         ))}
       </div>
     </div>

@@ -3,7 +3,11 @@ export class Card {
   public rank: number;
   public folded: boolean;
 
-  constructor(suit: "hearts" | "diamonds" | "clubs" | "spades", rank: number, folded: boolean = false) {
+  constructor(
+    suit: "hearts" | "diamonds" | "clubs" | "spades",
+    rank: number,
+    folded: boolean = false,
+  ) {
     this.suit = suit;
     this.rank = rank;
     this.folded = folded;
@@ -14,6 +18,10 @@ export class Card {
       return this.rank - other.rank;
     }
     return 0;
+  }
+
+  public equals(other: Card): boolean {
+    return this.suit === other.suit && this.rank === other.rank;
   }
 
   public getImagePath(): string {
@@ -30,32 +38,34 @@ export class Card {
     const rankStr = rankNames[this.rank] || this.rank.toString();
     return `./cards/${rankStr}_of_${this.suit}.png`;
   }
-
 }
 
 export class Deck {
-    public cards: Card[] = [];
+  public cards: Card[] = [];
 
-    constructor(shuffle: boolean = true, folded: boolean = false) {
-        const suits: ("hearts" | "diamonds" | "clubs" | "spades")[] = ["hearts", "diamonds", "clubs", "spades"];
-        for (const suit of suits) {
-            for (let rank = 1; rank <= 13; rank++) {
-                this.cards.push(new Card(suit, rank, folded));
-            }
-        }
-        if (shuffle) this.shuffle();
+  constructor(shuffle: boolean = true, folded: boolean = false) {
+    const suits: ("hearts" | "diamonds" | "clubs" | "spades")[] = [
+      "hearts",
+      "diamonds",
+      "clubs",
+      "spades",
+    ];
+    for (const suit of suits) {
+      for (let rank = 1; rank <= 13; rank++) {
+        this.cards.push(new Card(suit, rank, folded));
+      }
     }
+    if (shuffle) this.shuffle();
+  }
 
-    public shuffle() {
-        for (let i = this.cards.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
-        }
-
+  public shuffle() {
+    for (let i = this.cards.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
     }
+  }
 
-    public getACard(): Card | null {
-        return this.cards.pop() || null;
-    }
-
+  public getACard(): Card | null {
+    return this.cards.pop() || null;
+  }
 }
