@@ -2,6 +2,7 @@ export class Card {
   public suit: "hearts" | "diamonds" | "clubs" | "spades";
   public rank: number;
   public folded: boolean;
+  public color: "red" | "black";
 
   constructor(
     suit: "hearts" | "diamonds" | "clubs" | "spades",
@@ -11,6 +12,11 @@ export class Card {
     this.suit = suit;
     this.rank = rank;
     this.folded = folded;
+    if (suit === "hearts" || suit === "diamonds") {
+      this.color = "red";
+    } else {
+      this.color = "black";
+    }
   }
 
   public compareTo(other: Card): number {

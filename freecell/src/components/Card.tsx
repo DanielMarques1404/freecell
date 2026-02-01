@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Card } from "../core/domain/entities/card";
+import { useGame } from "../app/context/GameContext";
 
 type CardProps = {
   card: Card;
@@ -8,6 +9,7 @@ type CardProps = {
 
 export const CardImage = ({ card, onclick }: CardProps) => {
   const [localCard, setLocalCard] = useState<Card>(card);
+  const { game, setGame } = useGame();
 
   useEffect(() => {
     setLocalCard(card);
@@ -18,9 +20,14 @@ export const CardImage = ({ card, onclick }: CardProps) => {
   //   setLocalCard(newCard);
   // };
 
+  const handleClick = () => {
+    game.moveNextContainer(card)
+    setGame(game.copy())
+  }
+
   return (
     <img
-      onClick={() => onclick && onclick(localCard)}
+      onClick={handleClick}
       className="h-44 cursor-pointer border-2 border-gray-500 rounded-md hover:scale-105 transition-transform"
       src={localCard.getImagePath()}
       alt={localCard.getImagePath()}

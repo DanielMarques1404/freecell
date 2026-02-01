@@ -60,6 +60,11 @@ test("Testando mover carta da coluna para a pilha", () => {
   }
 });
 
+// test("Testando mover carta para próximo container", () => {
+//     const game = new Game(new Deck(true, false));
+//     game.moveFromColumnToGuar
+// })
+
 test("Testando mover carta qualquer para a pilha", () => {
   const game = new Game(new Deck(false, false));
   const card0 = new Card("diamonds", 2);

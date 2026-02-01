@@ -9,7 +9,12 @@ type CardContainerProps = {
   onclick?: (card: Card) => void;
 };
 
-export const CardContainer = ({ color, over = false, cards, onclick }: CardContainerProps) => {
+export const CardContainer = ({
+  color,
+  over = false,
+  cards,
+  onclick,
+}: CardContainerProps) => {
   const [localCards, setLocalCards] = useState<Card[] | undefined>(cards);
 
   useEffect(() => {
@@ -34,7 +39,7 @@ export const CardContainer = ({ color, over = false, cards, onclick }: CardConta
               className="absolute flex items-center justify-center p-1 left-0"
               style={{ top: `${over ? 0 : index * 36}px` }}
               key={index}
-              draggable={true}
+              draggable={false}
             >
               <CardImage card={card} onclick={onclick && onclick} />
             </li>

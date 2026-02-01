@@ -1,13 +1,15 @@
 import { Card, Deck } from "./card";
 
-export type CardOrigin = {
-  value: "deck" | "guard" | "pile" | "column" | null;
+type CardOrigin = {
+  container: "deck" | "guard" | "pile" | "column";
+  column: number;
+  index: number;
 };
 
 export class Game {
   readonly MAX_GUARDS = 4;
 
-  private _guards: Card[] | undefined[] = [
+  private _guards: (Card | undefined)[] = [
     undefined,
     undefined,
     undefined,
@@ -31,6 +33,38 @@ export class Game {
         if (card) this._columns[i].push(card);
       }
     }
+  }
+
+  getCardOrigin(card: Card): CardOrigin {
+    if (this._guards.includes(card)) {
+      return {
+        container: "guard",
+        column: -1,
+        index: this._guards.findIndex((g) => g?.equals(card)),
+      };
+    }
+
+    for (let i = 0; i < this._piles.length; i++) {
+      if (this._piles[i].includes(card)) {
+        return {
+          container: "pile",
+          column: i,
+          index: this._piles[i].findIndex((c) => c.equals(card)),
+        };
+      }
+    }
+
+    for (let i = 0; i < this._columns.length; i++) {
+      if (this._columns[i].includes(card)) {
+        return {
+          container: "column",
+          column: i,
+          index: this._columns[i].findIndex((c) => c.equals(card)),
+        };
+      }
+    }
+
+    return { container: "deck", column: -1, index: -1 };
   }
 
   moveFromColumnToGuard(card: Card): boolean {
@@ -62,6 +96,33 @@ export class Game {
     }
   }
 
+  moveNextContainer(card: Card): boolean {
+    let moved = false;
+    const origin = this.getCardOrigin(card);
+
+    if (["pile", "deck"].includes(origin.container)) return false;
+
+    if (origin.container === "column") {
+      if (origin.index !== this._columns[origin.column].length - 1) {
+        return false;
+      }
+      moved = this.moveFromColumnToGuard(card);
+      if (moved) return moved;
+      moved = this.moveFromColumnToPile(card);
+      if (moved) return moved;
+      moved = this.moveFromColumnToColumn(card);
+
+    }
+
+    if (origin.container === "guard") {
+      moved = this.moveFromGuardToPile(card);
+      if (moved) return moved;
+      moved = this.moveFromGuardToColumn(card);
+    }
+
+    return moved;
+  }
+
   getPileToMove(card: Card): Card[] | null {
     let pileIndex = this._piles.findIndex(
       (pile) => pile.length > 0 && pile[0].suit === card.suit,
@@ -91,12 +152,36 @@ export class Game {
     return true;
   }
 
-  moveFromGuardToColumn(card: Card, columnIndex: number): boolean {
-    if (this._columns[columnIndex].length >= 7) {
-      return false;
+  moveFromGuardToColumn(card: Card): boolean {
+    for (let i = 0; i < this._columns.length; i++) {
+      const column = this._columns[i];
+      if (
+        column.length === 0 ||
+        (card.compareTo(column[column.length - 1]) === -1 &&
+          card.color !== column[column.length - 1].color)
+      ) {
+        column.push(card);
+        this.removeFromGuard(card);
+        return true;
+      }
     }
-    this._columns[columnIndex].push(card);
-    this.removeFromGuard(card);
+    return false;
+  }
+
+  moveFromColumnToColumn(card: Card): boolean {
+    const origin = this.getCardOrigin(card)
+    const targetColumnIndex = this._columns.findIndex(
+      (_, i) => i !== origin.column && 
+      (this._columns[i].length === 0 ||
+        (card.compareTo(this._columns[i][this._columns[i].length - 1]) === -1 &&
+        card.color !== this._columns[i][this._columns[i].length - 1].color))
+    );
+
+    if (targetColumnIndex === -1) return false;
+
+    const targetColumn = this._columns[targetColumnIndex];
+    targetColumn.push(card);
+    this.removeFromColumns(card);
     return true;
   }
 

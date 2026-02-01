@@ -1,8 +1,7 @@
 import { useGame } from "./app/context/GameContext";
-import { CardContainer } from "./components/CardContainer";
+import { ColumnCardsPanel } from "./components/layout/ColumnCardsPanel";
 import { InfoPanel } from "./components/layout/InfoPanel";
 import { RestCardsPanel } from "./components/layout/RestCardsPanel";
-import type { Card } from "./core/domain/entities/card";
 
 export const AppContent = () => {
   const { game, setGame } = useGame();
@@ -23,37 +22,28 @@ export const AppContent = () => {
     setGame(game.copy());
   };
 
-  const handleClickCard = (card: Card) => {
-    game.getColumns().forEach(column => {
-      if (column[column.length-1] === card) {
-        if ( card.compareTo(column[column.length-1]) === 1) { //criar método para decidir para onde a carta vai
-          game.moveFromColumnToPile(card);
-          setGame(game.copy());
-          return;
-        }
-        game.moveFromColumnToGuard(card);
-        setGame(game.copy());
-        return;
-      }
-    })
-    console.log(`Card clicked: ${card.suit} ${card.rank}`);
-  }
+  // const handleClickCard = (card: Card) => {
+  //   game.getColumns().forEach(column => {
+  //     if (column[column.length-1] === card) {
+  //       if ( card.compareTo(column[column.length-1]) === 1) { //criar método para decidir para onde a carta vai
+  //         game.moveFromColumnToPile(card);
+  //         setGame(game.copy());
+  //         return;
+  //       }
+  //       game.moveFromColumnToGuard(card);
+  //       setGame(game.copy());
+  //       return;
+  //     }
+  //   })
+  //   console.log(`Card clicked: ${card.suit} ${card.rank}`);
+  // }
 
   return (
     <div className="flex flex-col gap-2 h-screen p-4 bg-green-700">
       <InfoPanel />
       <RestCardsPanel />
       <div className="flex-1">
-        <div className="grid grid-cols-8 gap-2 flex-wrap mt-4 mx-20">
-          <CardContainer cards={game.getColumn(0)} color={""} onclick={handleClickCard}/>
-          <CardContainer cards={game.getColumn(1)} color={""} onclick={handleClickCard}/>
-          <CardContainer cards={game.getColumn(2)} color={""} onclick={handleClickCard}/>
-          <CardContainer cards={game.getColumn(3)} color={""} onclick={handleClickCard}/>
-          <CardContainer cards={game.getColumn(4)} color={""} onclick={handleClickCard}/>
-          <CardContainer cards={game.getColumn(5)} color={""} onclick={handleClickCard}/>
-          <CardContainer cards={game.getColumn(6)} color={""} onclick={handleClickCard}/>
-          <CardContainer cards={game.getColumn(7)} color={""} onclick={handleClickCard}/>
-        </div>
+        <ColumnCardsPanel />
       </div>
       <div className="flex border-2 border-green-400">
         <button className="border-2 border-gray-600" onClick={handleMove}>
