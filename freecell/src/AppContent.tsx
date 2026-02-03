@@ -6,21 +6,21 @@ import { RestCardsPanel } from "./components/layout/RestCardsPanel";
 export const AppContent = () => {
   const { game, setGame } = useGame();
 
-  const handleMove = () => {
-    game.moveFromColumnToGuard(game.getColumn(2)[game.getColumn(2).length - 1]);
-    setGame(game.copy());
-  };
-  
-  const handleMove1 = () => {
-    game.moveFromColumnToPile(
-      game.getColumn(2)[game.getColumn(2).length - 1]);
-    setGame(game.copy());
-  };
+  // const handleMove = () => {
+  //   game.moveFromColumnToGuard(game.getColumn(2)[game.getColumn(2).length - 1]);
+  //   setGame(game.copy());
+  // };
 
-  const handleMove2 = () => {
-    game.moveFromGuardToPile(game.getGuard(0)!);
-    setGame(game.copy());
-  };
+  // const handleMove1 = () => {
+  //   game.moveFromColumnToPile(
+  //     game.getColumn(2)[game.getColumn(2).length - 1]);
+  //   setGame(game.copy());
+  // };
+
+  // const handleMove2 = () => {
+  //   game.moveFromGuardToPile(game.getGuard(0)!);
+  //   setGame(game.copy());
+  // };
 
   // const handleClickCard = (card: Card) => {
   //   game.getColumns().forEach(column => {
@@ -41,11 +41,12 @@ export const AppContent = () => {
   return (
     <div className="flex flex-col gap-2 h-screen p-4 bg-green-700">
       <InfoPanel />
-      <RestCardsPanel />
+
+      <RestCardsPanel guards={game.getGuards().getCards()} piles={game.getPiles().map(pile => pile.getCards())} />
       <div className="flex-1">
         <ColumnCardsPanel />
       </div>
-      <div className="flex border-2 border-green-400">
+      {/* <div className="flex border-2 border-green-400">
         <button className="border-2 border-gray-600" onClick={handleMove}>
           Coluna para Guard
         </button>
@@ -53,7 +54,7 @@ export const AppContent = () => {
           Coluna para Pile
         </button>
         <button className="border-2 border-gray-600" onClick={handleMove2}>Guard para Pile</button>
-      </div>
+      </div> */}
     </div>
   );
 };

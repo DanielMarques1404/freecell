@@ -1,5 +1,6 @@
-import { Card } from "../core/domain/entities/card";
+import { Card, Deck } from "../core/domain/entities/card";
 import { ColumnContainer, Container, FinalContainer, GuardContainer } from "../core/domain/entities/containers";
+import { Game } from "../core/domain/entities/game-tools";
 
 // test("Testando a criação do deck", () => {
 //   const deck = new Deck(true, false);
@@ -174,8 +175,24 @@ test("Testando Receber/Mover carta para column", () => {
     expect(r5).toBe(false)
     
     //tentando colocar uma carta de cor diferente e na ordem certa
-    console.log(container.getCards())
     const r6 = container.receive(clubs_9)
     expect(r6).toBe(true)
     
+})
+
+test("Mover card de column para guard", () => {
+    const game = new Game(new Deck(true, false))
+    const column_2: (Card | undefined)[] = game.getColumn(2).getCards()
+    const okCard: Card = column_2[column_2.length-1]!
+    const notOkCard: Card = column_2[0]!
+
+    // console.log("column2",column_2, "guards", game.getGuards().getCards(), okCard, notOkCard)
+
+    //Movendo última carta possível da coluna para o guard
+    const r1 = game.moveTo(notOkCard, {container: "guard"})
+    expect(r1).toBe(false)
+
+    //Movendo primeira carta da coluna para o guard
+    const r2 = game.moveTo(okCard, {container: "guard"})
+    expect(r2).toBe(true)
 })

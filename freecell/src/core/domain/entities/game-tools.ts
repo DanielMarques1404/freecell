@@ -6,14 +6,20 @@ import {
   type Container,
 } from "./containers";
 
-type CardOrigin = {
+
+export type CardLocation = {
   container: "deck" | "guard" | "pile" | "column";
-  column: number;
-  index: number;
+  column?: number;
+  index?: number;
 };
 
 export class Game {
-  private _guards: Container = new GuardContainer([]);
+  private _guards: Container = new GuardContainer([
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  ]);
   private _piles: Container[] = [
     new FinalContainer([]),
     new FinalContainer([]),
@@ -50,8 +56,8 @@ export class Game {
     }
   }
 
-  private getCardOrigin(card: Card): CardOrigin {
-    if (this._guards.hasThisCard(card)) {
+  private getCardOrigin(card: Card): CardLocation {
+    if (this._guards.hasThisCard(card) > -1) {
       return {
         container: "guard",
         column: -1,
@@ -60,7 +66,7 @@ export class Game {
     }
 
     for (let i = 0; i < this._piles.length; i++) {
-      if (this._piles[i].hasThisCard(card)) {
+      if (this._piles[i].hasThisCard(card) > -1) {
         return {
           container: "pile",
           column: i,
@@ -70,7 +76,7 @@ export class Game {
     }
 
     for (let i = 0; i < this._columns.length; i++) {
-      if (this._columns[i].hasThisCard(card)) {
+      if (this._columns[i].hasThisCard(card) > -1) {
         return {
           container: "column",
           column: i,

@@ -6,14 +6,14 @@ export const ColumnCardsPanel = () => {
     
     return (
         <div className="grid grid-cols-8 gap-2 flex-wrap mt-4 mx-20">
-          <CardContainer cards={game.getColumn(0)} color={""} />
-          <CardContainer cards={game.getColumn(1)} color={""} />
-          <CardContainer cards={game.getColumn(2)} color={""} />
-          <CardContainer cards={game.getColumn(3)} color={""} />
-          <CardContainer cards={game.getColumn(4)} color={""} />
-          <CardContainer cards={game.getColumn(5)} color={""} />
-          <CardContainer cards={game.getColumn(6)} color={""} />
-          <CardContainer cards={game.getColumn(7)} color={""} />
+          <CardContainer cards={game.getColumns()[0].getCards()} color={""} />
+          <CardContainer cards={game.getColumns()[1].getCards()} color={""} />
+          <CardContainer cards={game.getColumns()[2].getCards()} color={""} />
+          <CardContainer cards={game.getColumns()[3].getCards()} color={""} />
+          <CardContainer cards={game.getColumns()[4].getCards()} color={""} />
+          <CardContainer cards={game.getColumns()[5].getCards()} color={""} />
+          <CardContainer cards={game.getColumns()[6].getCards()} color={""} />
+          <CardContainer cards={game.getColumns()[7].getCards()} color={""} />
         </div>
     );
 }

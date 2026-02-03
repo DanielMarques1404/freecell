@@ -5,7 +5,7 @@ import { CardImage } from "./Card";
 type CardContainerProps = {
   color: "light" | "dark" | "";
   over?: boolean;
-  cards?: Card[];
+  cards: (Card | undefined)[];
   onclick?: (card: Card) => void;
 };
 
@@ -15,7 +15,7 @@ export const CardContainer = ({
   cards,
   onclick,
 }: CardContainerProps) => {
-  const [localCards, setLocalCards] = useState<Card[] | undefined>(cards);
+  const [localCards, setLocalCards] = useState<(Card | undefined)[]>(cards);
 
   useEffect(() => {
     setLocalCards(cards)
@@ -41,7 +41,7 @@ export const CardContainer = ({
               key={index}
               draggable={false}
             >
-              <CardImage card={card} onclick={onclick && onclick} />
+              <CardImage card={card} onclick={onclick} />
             </li>
           ))}
       </ul>

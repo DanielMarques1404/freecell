@@ -1,24 +1,22 @@
-import { useGame } from "../../app/context/GameContext";
+import type { Card } from "../../core/domain/entities/card";
 import { CardContainer } from "../CardContainer";
 
+type Props = {
+  guards: (Card | undefined)[];
+  piles?: (Card | undefined)[][];
+};
 
-export const RestCardsPanel = () => {
-  const { game } = useGame();
-
+export const RestCardsPanel = ({ guards, piles }: Props) => {
   return (
     <div className="flex items-center justify-between">
       <div className="flex gap-2">
-        {game.getGuards().map((card, index) => (
-          <CardContainer
-            key={index}
-            cards={card ? [card] : []}
-            color={"dark"}
-          />
+        {guards.map((card, index) => (
+          <CardContainer key={`g-${index}`} cards={[card]} color="dark"/>
         ))}
       </div>
       <div className="flex gap-2">
-        {game.getPiles().map((card, index) => (
-          <CardContainer key={index} cards={card ? card : []} color={"light"} over />
+        {piles?.map((pile, index) => (
+            <CardContainer key={`p-${index}`} cards={pile} color="light" />
         ))}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { Deck } from "../../core/domain/entities/card";
-import { Game } from "../../core/domain/entities/game";
+import { Game } from "../../core/domain/entities/game-tools";
 
 type GameContextType = {
   game: Game;

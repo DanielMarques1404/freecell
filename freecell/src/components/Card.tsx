@@ -1,36 +1,30 @@
 import { useEffect, useState } from "react";
 import { Card } from "../core/domain/entities/card";
-import { useGame } from "../app/context/GameContext";
 
 type CardProps = {
-  card: Card;
+  card?: Card;
   onclick?: (card: Card) => void;
 };
 
 export const CardImage = ({ card, onclick }: CardProps) => {
-  const [localCard, setLocalCard] = useState<Card>(card);
-  const { game, setGame } = useGame();
+  const [localCard, setLocalCard] = useState<Card | undefined>(card);
 
   useEffect(() => {
     setLocalCard(card);
   }, [card]);
 
-  // const foldCard = () => {
-  //   const newCard = new Card(localCard.suit, localCard.rank, !localCard.folded);
-  //   setLocalCard(newCard);
-  // };
-
   const handleClick = () => {
-    game.moveNextContainer(card)
-    setGame(game.copy())
+    if (onclick && localCard) onclick(localCard)
   }
+
+  if (!localCard) return ""
 
   return (
     <img
       onClick={handleClick}
-      className="h-44 cursor-pointer border-2 border-gray-500 rounded-md hover:scale-105 transition-transform"
-      src={localCard.getImagePath()}
-      alt={localCard.getImagePath()}
+      className={`h-44 min-w-32 cursor-pointer border-2 border-gray-500 rounded-md hover:scale-105 transition-transform `}
+      src={localCard?.getImagePath()}
+      alt={localCard?.getImagePath()}
     />
   );
 };
