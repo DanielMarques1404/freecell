@@ -1,49 +1,22 @@
-interface Memento {
-    getState(): string;
+import type { Game, GameState } from "./entities/game-tools";
+
+export interface Memento {
+    getState(): GameState;
     getName(): string;
     getDate(): string;
 }
 
-export class Originator {
-    private state: string;
 
-    constructor(state: string) {
-        this.state = state
-        console.log(`Originator: My initial state is: ${state}`)
-    }
-
-    private getRandomString(length: number = 10): string {
-        const charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUWVXYZ'
-        return Array.apply(null, { length } as any).map(() => charSet.charAt(Math.floor(Math.random() * charSet.length))).join('')
-    }
-    
-    action(): void {
-        console.log('Originator: executing an action')
-        this.state = this.getRandomString(30)
-        console.log(`Originator: and my state has changed to: ${this.state}`)
-    }
-   
-
-    save(): Memento {
-        return new SomeMemento(this.state)
-    }
-
-    restore(memento: Memento): void {
-        this.state = memento.getState()
-        console.log(`Originator: My state has changed to: ${this.state}`)
-    }
-}
-
-class SomeMemento implements Memento {
-    private state: string
+export class GameMemento implements Memento {
+    private state: GameState
     private date: string
     
-    constructor(state: string) {
+    constructor(state: GameState) {
         this.state = state
         this.date = new Date().toISOString().slice(0,19).replace('T',' ')
     }
 
-    getState(): string {
+    getState(): GameState {
         return this.state
     }
     
@@ -52,27 +25,28 @@ class SomeMemento implements Memento {
     }
 
     getName(): string {
-        return `${this.date} / (${this.state.substring(0,9)}...)`
+        return `${this.date} / (${this.state.name})`
     }
 }
 
 export class Caretaker {
     private mementos: Memento[] = []
-    private originator: Originator;
+    private originator: Game;
 
-    constructor(originator: Originator) {
+    constructor(originator: Game) {
         this.originator = originator
     }
 
     backup(): void {
-        console.log('\nCaretaker: Saving Originator\'s state ...')
-        this.mementos.push(this.originator.save())
+        const mm = this.originator.save()
+        console.log('\nCaretaker: Saving Originator\'s state ...', [...mm.getState().columns[2].getCards()!], mm.getState().guards.getCards())
+        this.mementos.push(mm)
     }
 
     undo() : void {
         if (!this.mementos.length) return
         const memento = this.mementos.pop()
-        console.log(`Caretaker: Restoring state to: ${memento?.getName()}`)
+        console.log(`Caretaker: Restoring state to: ${memento?.getName()}`, [...memento?.getState().columns[2].getCards()!], memento?.getState().guards.getCards())
         if (memento) this.originator.restore(memento)
     }
 

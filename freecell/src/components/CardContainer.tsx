@@ -30,7 +30,7 @@ export const CardContainer = ({
 
   return (
     <div
-      className={`relative flex items-center justify-center w-32 h-48 p-1 ${bgColor}`}
+      className={`relative flex items-center justify-center w-36 h-48 p-1 ${bgColor}`}
     >
       <ul>
         {localCards &&

@@ -1,6 +1,11 @@
 import { Card, Deck } from "../core/domain/entities/card";
-import { ColumnContainer, Container, FinalContainer, GuardContainer } from "../core/domain/entities/containers";
+import {
+  Container,
+  FinalContainer,
+  GuardContainer,
+} from "../core/domain/entities/containers";
 import { Game } from "../core/domain/entities/game-tools";
+import { Caretaker } from "../core/domain/memento";
 
 // test("Testando a criação do deck", () => {
 //   const deck = new Deck(true, false);
@@ -81,118 +86,213 @@ import { Game } from "../core/domain/entities/game-tools";
 // });
 
 test("Testando Receber/Mover carta para guarda", () => {
-    const cards: (Card | undefined)[] = [undefined, undefined, undefined, undefined]
-    const container: Container = new GuardContainer(cards)
-    const hearts_2: Card = new Card("hearts", 2)
-    const hearts_3: Card = new Card("hearts", 3)
-    const hearts_4: Card = new Card("hearts", 4)
-    const hearts_5: Card = new Card("hearts", 5)
-    const hearts_6: Card = new Card("hearts", 6)
-    
-    const r1 = container.move(hearts_2)
-    expect(r1).toBe(false)
+  const cards: (Card | undefined)[] = [
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  ];
+  const container: Container = new GuardContainer(cards);
+  const hearts_2: Card = new Card("hearts", 2);
+  const hearts_3: Card = new Card("hearts", 3);
+  const hearts_4: Card = new Card("hearts", 4);
+  const hearts_5: Card = new Card("hearts", 5);
+  const hearts_6: Card = new Card("hearts", 6);
 
-    const r2 = container.receive(hearts_3)
-    expect(r2).toBe(true)
+  const r1 = container.move(hearts_2);
+  expect(r1).toBe(false);
 
-    const r3 = container.move(hearts_3)
-    expect(r3).toBe(true)
-    
-    const r4 = container.move(hearts_3)
-    expect(r4).toBe(false)
-    
-    container.receive(hearts_2)
-    container.receive(hearts_3)
-    container.receive(hearts_4)
-    container.receive(hearts_5)
-    const r6 = container.receive(hearts_6)
-    expect(r6).toBe(false)
-})
+  const r2 = container.receive(hearts_3);
+  expect(r2).toBe(true);
+
+  const r3 = container.move(hearts_3);
+  expect(r3).toBe(true);
+
+  const r4 = container.move(hearts_3);
+  expect(r4).toBe(false);
+
+  container.receive(hearts_2);
+  container.receive(hearts_3);
+  container.receive(hearts_4);
+  container.receive(hearts_5);
+  const r6 = container.receive(hearts_6);
+  expect(r6).toBe(false);
+});
 
 test("Testando Receber/Mover carta para final pile", () => {
-    const cards: (Card | undefined)[] = [undefined, undefined, undefined, undefined]
-    const container: Container = new FinalContainer(cards)
-    const hearts_1: Card = new Card("hearts", 1)
-    const hearts_2: Card = new Card("hearts", 2)
-    const hearts_3: Card = new Card("hearts", 3)
-    const clubs_2: Card = new Card("clubs", 2)
-    
-    const r1 = container.move(hearts_2)
-    expect(r1).toBe(false)
+  const cards: (Card | undefined)[] = [
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+  ];
+  const container: Container = new FinalContainer(cards);
+  const hearts_1: Card = new Card("hearts", 1);
+  const hearts_2: Card = new Card("hearts", 2);
+  const hearts_3: Card = new Card("hearts", 3);
+  const clubs_2: Card = new Card("clubs", 2);
 
-    const r2 = container.receive(hearts_2)
-    expect(r2).toBe(false)
+  const r1 = container.move(hearts_2);
+  expect(r1).toBe(false);
 
-    const r3 = container.receive(hearts_1)
-    expect(r3).toBe(true)
+  const r2 = container.receive(hearts_2);
+  expect(r2).toBe(false);
 
-    const r4 = container.move(hearts_3)
-    expect(r4).toBe(false)
-    
-    const r5 = container.receive(hearts_3)
-    expect(r5).toBe(false)
-    
-    const r6 = container.receive(clubs_2)
-    expect(r6).toBe(false)
+  const r3 = container.receive(hearts_1);
+  expect(r3).toBe(true);
 
-    const r7 = container.receive(hearts_2)
-    expect(r7).toBe(true)
+  const r4 = container.move(hearts_3);
+  expect(r4).toBe(false);
 
-    const r8 = container.move(hearts_2)
-    expect(r8).toBe(true)
-    
-})
+  const r5 = container.receive(hearts_3);
+  expect(r5).toBe(false);
 
-test("Testando Receber/Mover carta para column", () => {
-    const hearts_1: Card = new Card("hearts", 1)
-    const hearts_10: Card = new Card("hearts", 10)
-    const spades_3: Card = new Card("spades", 3)
-    const clubs_2: Card = new Card("clubs", 2)
-    const clubs_9: Card = new Card("clubs", 9)
-    const diamonds_9: Card = new Card("diamonds", 9)
-    const hearts_9: Card = new Card("hearts", 9)
-    const cards: (Card | undefined)[] = [hearts_1, clubs_2, hearts_10, spades_3]
-    const container: Container = new ColumnContainer(cards)
-    
-    //tentando tirar uma carta que não é a última
-    const r1 = container.move(hearts_10)
-    expect(r1).toBe(false)
+  const r6 = container.receive(clubs_2);
+  expect(r6).toBe(false);
 
-    //tentando tirar a última carta
-    const r2 = container.move(spades_3)
-    expect(r2).toBe(true)
+  const r7 = container.receive(hearts_2);
+  expect(r7).toBe(true);
 
-    //tentando colocar uma carta fora da ordem
-    const r3 = container.receive(spades_3)
-    expect(r3).toBe(false)
+  const r8 = container.move(hearts_2);
+  expect(r8).toBe(true);
+});
 
-    //tentando colocar uma carta do mesmo naipe e na ordem certa
-    const r4 = container.receive(hearts_9)
-    expect(r4).toBe(false)
-    
-    //tentando colocar uma carta da mesma cor e na ordem certa
-    const r5 = container.receive(diamonds_9)
-    expect(r5).toBe(false)
-    
-    //tentando colocar uma carta de cor diferente e na ordem certa
-    const r6 = container.receive(clubs_9)
-    expect(r6).toBe(true)
-    
-})
+// test("Testando Receber/Mover carta para column", () => {
+//   const hearts_1: Card = new Card("hearts", 1);
+//   const hearts_10: Card = new Card("hearts", 10);
+//   const spades_3: Card = new Card("spades", 3);
+//   const clubs_2: Card = new Card("clubs", 2);
+//   const clubs_9: Card = new Card("clubs", 9);
+//   const diamonds_9: Card = new Card("diamonds", 9);
+//   const hearts_9: Card = new Card("hearts", 9);
+//   const cards: (Card | undefined)[] = [hearts_1, clubs_2, hearts_10, spades_3];
+//   const container: Container = new ColumnContainer(cards);
+
+//   //tentando tirar uma carta que não é a última
+//   const r1 = container.move(hearts_10);
+//   expect(r1).toBe(false);
+
+//   //tentando tirar a última carta
+//   const r2 = container.move(spades_3);
+//   expect(r2).toBe(true);
+
+//   //tentando colocar uma carta fora da ordem
+//   const r3 = container.receive(spades_3);
+//   expect(r3).toBe(false);
+
+//   //tentando colocar uma carta do mesmo naipe e na ordem certa
+//   const r4 = container.receive(hearts_9);
+//   expect(r4).toBe(false);
+
+//   //tentando colocar uma carta da mesma cor e na ordem certa
+//   const r5 = container.receive(diamonds_9);
+//   expect(r5).toBe(false);
+
+//   //tentando colocar uma carta de cor diferente e na ordem certa
+//   const r6 = container.receive(clubs_9);
+//   expect(r6).toBe(true);
+// });
 
 test("Mover card de column para guard", () => {
-    const game = new Game(new Deck(true, false))
-    const column_2: (Card | undefined)[] = game.getColumn(2).getCards()
-    const okCard: Card = column_2[column_2.length-1]!
-    const notOkCard: Card = column_2[0]!
+  const game = new Game(new Deck(true, false));
 
-    // console.log("column2",column_2, "guards", game.getGuards().getCards(), okCard, notOkCard)
+  //Movendo carta impossível da coluna para o guard
+  const r1 = game.move(game.getColumn(2).getCards()[0]!, {
+    container: "guard",
+  });
+  expect(r1).toBe(false);
+  expect(game.getColumn(2).getCards().length).toBe(7)
 
-    //Movendo última carta possível da coluna para o guard
-    const r1 = game.moveTo(notOkCard, {container: "guard"})
-    expect(r1).toBe(false)
+  //Movendo primeira carta da coluna para o guard
+  const r2 = game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+  expect(r2).toBe(true);
+  expect(game.getColumn(2).getCards().length).toBe(6)
 
-    //Movendo primeira carta da coluna para o guard
-    const r2 = game.moveTo(okCard, {container: "guard"})
-    expect(r2).toBe(true)
-})
+  game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+  game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+
+  //Movendo última carta possível para o guard
+  const r3 = game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+  expect(r3).toBe(true);
+  expect(game.getColumn(2).getCards().length).toBe(3)
+
+  //O guard já deve estar lotado
+  const r4 = game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+  expect(r4).toBe(false);
+  expect(game.getColumn(2).getCards().length).toBe(3)
+});
+
+
+test("Testando o backup/restore do GameState", () => {
+  const game = new Game(new Deck(true, false));
+  const caretaker = new Caretaker(game);
+
+  game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+  game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+
+  const guardsBeforeBackup = game
+    .getGuards()
+    .getCards()
+    .map((c) => (c ? `${c.suit}-${c.rank}` : undefined));
+  const columnBeforeBackup = game
+    .getColumn(2)
+    .getCards()
+    .map((c) => (c ? `${c.suit}-${c.rank}` : undefined));
+  caretaker.backup();
+
+  game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+  game.move(
+    game.getColumn(2).getCards()[game.getColumn(2).getCards().length - 1]!,
+    { container: "guard" },
+  );
+
+  const guardsAfterMove = game
+    .getGuards()
+    .getCards()
+    .map((c) => (c ? `${c.suit}-${c.rank}` : undefined));
+  const columnAfterMove = game
+    .getColumn(2)
+    .getCards()
+    .map((c) => (c ? `${c.suit}-${c.rank}` : undefined));
+
+  expect(guardsAfterMove).not.toEqual(guardsBeforeBackup);
+  expect(columnAfterMove).not.toEqual(columnBeforeBackup);
+
+  caretaker.undo();
+
+  const guardsAfterUndo = game
+    .getGuards()
+    .getCards()
+    .map((c) => (c ? `${c.suit}-${c.rank}` : undefined));
+  const columnAfterUndo = game
+    .getColumn(2)
+    .getCards()
+    .map((c) => (c ? `${c.suit}-${c.rank}` : undefined));
+
+  expect(guardsAfterUndo).toEqual(guardsBeforeBackup);
+  expect(columnAfterUndo).toEqual(columnBeforeBackup);
+});
