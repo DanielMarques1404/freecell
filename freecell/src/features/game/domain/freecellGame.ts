@@ -18,12 +18,14 @@ export class FreeCellGame {
   private _piles: Container[];
   private _columns: Container[];
   private _deck: Deck;
+  private _moveCounter: number;
 
   constructor() {
     this._guards = [];
     this._piles = [];
     this._columns = [];
     this._deck = new Deck(true);
+    this._moveCounter = 0
 
     for (let g = 0; g < 4; g++) {
       this._guards.push(new GuardContainer());
@@ -93,6 +95,7 @@ export class FreeCellGame {
       const popedCard = this.getColumns()[origin.index].pop();
       if (popedCard) this.getGuards()[destination.index].add(popedCard);
 
+      this._moveCounter++;
       return true;
     }
 
@@ -106,6 +109,7 @@ export class FreeCellGame {
       const popedCard = this.getColumns()[origin.index].pop();
       if (popedCard) this.getPiles()[destination.index].add(popedCard);
 
+      this._moveCounter++
       return true;
     }
 
@@ -119,6 +123,7 @@ export class FreeCellGame {
       const popedCard = this.getColumns()[origin.index].pop();
       if (popedCard) this.getColumns()[destination.index].add(popedCard);
 
+      this._moveCounter++
       return true;
     }
 
@@ -132,6 +137,7 @@ export class FreeCellGame {
       const popedCard = this.getGuards()[origin.index].pop();
       if (popedCard) this.getColumns()[destination.index].add(popedCard);
 
+      this._moveCounter++
       return true;
     }
 
@@ -145,10 +151,11 @@ export class FreeCellGame {
       const popedCard = this.getGuards()[origin.index].pop();
       if (popedCard) this.getPiles()[destination.index].add(popedCard);
 
+      this._moveCounter++
       return true;
     }
 
-    return true;
+    return false;
   }
 
   // save(): Memento {
@@ -179,12 +186,17 @@ export class FreeCellGame {
     return this._columns;
   }
 
+  getMovesCounter() {
+    return this._moveCounter;
+  }
+
   copy(): FreeCellGame {
     const copiedGame = Object.create(FreeCellGame.prototype);
     copiedGame._deck = this._deck;
     copiedGame._guards = [...this._guards];
     copiedGame._piles = [...this._piles]; //this._piles.map((pile) => [...pile]);
     copiedGame._columns = [...this._columns]; // this._columns.map((column) => [...column]);
+    copiedGame._moveCounter = this._moveCounter;
     console.log(copiedGame);
     return copiedGame;
   }
