@@ -66,7 +66,7 @@ export class PileContainer extends Container {
   }
 
   public addRule(card: Card): boolean {
-    if (card.rank === 1) return true;
+    if (this.getCards().length === 0 && card.rank === 1) return true;
     if (this.getCards().length === 0) return false;
     if (this.getCards().length >= this.getMaxLenght()) return false;
 

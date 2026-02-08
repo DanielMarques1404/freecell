@@ -8,7 +8,7 @@ import { PileContainer } from "./features/cards/components/PileContainer";
 function App() {
   return (
     <GameProvider>
-      <div className="flex flex-col p-4 gap-4 h-screen bg-green-700">
+      <div className="flex flex-col p-4 gap-4 min-h-screen bg-green-700">
         <InfoPanel />
         <div className="flex justify-between">
           <GuardContainer color={"dark"} />

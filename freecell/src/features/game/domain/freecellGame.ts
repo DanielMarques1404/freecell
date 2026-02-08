@@ -75,6 +75,7 @@ export class FreeCellGame {
 
   move(card: Card, destination: CardLocalization): boolean {
     const origin = this.getCardLocalization(card);
+
     if (
       origin.container === destination.container &&
       origin.index === destination.index
@@ -96,6 +97,7 @@ export class FreeCellGame {
       if (popedCard) this.getGuards()[destination.index].add(popedCard);
 
       this._moveCounter++;
+      this.automaticMove()
       return true;
     }
 
@@ -110,6 +112,7 @@ export class FreeCellGame {
       if (popedCard) this.getPiles()[destination.index].add(popedCard);
 
       this._moveCounter++
+      this.automaticMove()
       return true;
     }
 
@@ -124,6 +127,7 @@ export class FreeCellGame {
       if (popedCard) this.getColumns()[destination.index].add(popedCard);
 
       this._moveCounter++
+      this.automaticMove()
       return true;
     }
 
@@ -138,6 +142,7 @@ export class FreeCellGame {
       if (popedCard) this.getColumns()[destination.index].add(popedCard);
 
       this._moveCounter++
+      this.automaticMove()
       return true;
     }
 
@@ -152,10 +157,36 @@ export class FreeCellGame {
       if (popedCard) this.getPiles()[destination.index].add(popedCard);
 
       this._moveCounter++
+      this.automaticMove()
       return true;
     }
 
     return false;
+  }
+
+  automaticMove() {
+    let hasMoves = true;
+    // const lastPilesCards: (Card | undefined)[] = this.getPiles().map(pile => pile.getCards().at(-1))
+    const lastGuardsCards: (Card | undefined)[] = this.getGuards().map(guard => guard.getCards().at(-1))
+    const lastColumnsCards: (Card | undefined)[] = this.getColumns().map(column => column.getCards().at(-1))
+
+    while (hasMoves) {
+      hasMoves = false
+      for (const guard of lastGuardsCards) {
+        if (guard) {
+          for (let p = 0; p < this.getPiles().length; p++) {
+            hasMoves = this.move(guard, {container: "pile", index: p, innerIndex: 0})
+          }
+        }
+      }
+      for (const column of lastColumnsCards) {
+        if (column) {
+          for (let p = 0; p < this.getPiles().length; p++) {
+            hasMoves = this.move(column, {container: "pile", index: p, innerIndex: 0})
+          }
+        }
+      }
+    }
   }
 
   // save(): Memento {
@@ -197,7 +228,6 @@ export class FreeCellGame {
     copiedGame._piles = [...this._piles]; //this._piles.map((pile) => [...pile]);
     copiedGame._columns = [...this._columns]; // this._columns.map((column) => [...column]);
     copiedGame._moveCounter = this._moveCounter;
-    console.log(copiedGame);
     return copiedGame;
   }
 }
