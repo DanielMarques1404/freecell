@@ -44,7 +44,6 @@ export class FreeCellGame {
   }
 
   getCardLocalization(card: Card): CardLocalization {
-    console.log(this.getColumns()[0].getCards(), card);
     for (let i = 0; i < this._guards.length; i++) {
       let idx = this.getGuards()
         [i].getCards()
@@ -73,7 +72,6 @@ export class FreeCellGame {
   }
 
   move(card: Card, destination: CardLocalization): boolean {
-    console.log('passando 1')
     const origin = this.getCardLocalization(card);
     if (
       origin.container === destination.container &&
@@ -99,7 +97,6 @@ export class FreeCellGame {
     }
 
     if (origin.container === "column" && destination.container === "pile") {
-      console.log('passando 2')
       if (
         !this.getColumns()[origin.index].popRule() ||
         !this.getPiles()[destination.index].addRule(card)
@@ -108,6 +105,19 @@ export class FreeCellGame {
 
       const popedCard = this.getColumns()[origin.index].pop();
       if (popedCard) this.getPiles()[destination.index].add(popedCard);
+
+      return true;
+    }
+
+    if (origin.container === "column" && destination.container === "column") {
+      if (
+        !this.getColumns()[origin.index].popRule() ||
+        !this.getColumns()[destination.index].addRule(card)
+      )
+        return false;
+
+      const popedCard = this.getColumns()[origin.index].pop();
+      if (popedCard) this.getColumns()[destination.index].add(popedCard);
 
       return true;
     }
@@ -121,6 +131,19 @@ export class FreeCellGame {
 
       const popedCard = this.getGuards()[origin.index].pop();
       if (popedCard) this.getColumns()[destination.index].add(popedCard);
+
+      return true;
+    }
+
+    if (origin.container === "guard" && destination.container === "pile") {
+      if (
+        !this.getPiles()[destination.index].addRule(card) ||
+        !this.getGuards()[origin.index].popRule()
+      )
+        return false;
+
+      const popedCard = this.getGuards()[origin.index].pop();
+      if (popedCard) this.getPiles()[destination.index].add(popedCard);
 
       return true;
     }

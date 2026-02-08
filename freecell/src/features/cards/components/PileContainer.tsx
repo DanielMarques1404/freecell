@@ -3,43 +3,49 @@ import { Card } from "../domain/card";
 import { bgColor, type CardContainerProps } from "../types";
 import { CardImage } from "./Card";
 
+const CARD_MIME = "application/x-freecell-card";
+
+function isCardDrag(dt: DataTransfer) {
+  return Array.from(dt.types).includes(CARD_MIME);
+}
+
+const SUITS = ["hearts", "diamonds", "clubs", "spades"] as const;
+type Suit = (typeof SUITS)[number];
+
+function isSuit(x: string): x is Suit {
+  return (SUITS as readonly string[]).includes(x);
+}
+
 export const PileContainer = ({ color }: CardContainerProps) => {
   const { game, setGame } = useGame();
-
-  const handleDragOverTarget = (event: React.DragEvent<HTMLLIElement>) => {
-    event.preventDefault();
-  };
-
-  const SUITS = ["hearts", "diamonds", "clubs", "spades"] as const;
-  type Suit = (typeof SUITS)[number];
-
-  function isSuit(x: string): x is Suit {
-    return (SUITS as readonly string[]).includes(x);
-  }
 
   const handleDragStartFromPile = (
     event: React.DragEvent<HTMLLIElement>,
     card?: Card,
   ) => {
-    console.log("passando 4");
     if (!card) return;
 
-    console.log("Dragging: ", card);
     event.dataTransfer.effectAllowed = "move";
-
-    event.dataTransfer.setData("text/plain", card.toString());
+    event.dataTransfer.setData(CARD_MIME, "1");
     event.dataTransfer.setData(
       "card",
       JSON.stringify({ suit: card.suit, rank: card.rank }),
     );
   };
 
-  const handleDragDropPile = (
+  const handleDragOverPile = (event: React.DragEvent<HTMLUListElement>) => {
+    if (!isCardDrag(event.dataTransfer)) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDropPile = (
     event: React.DragEvent<HTMLUListElement>,
     index: number,
   ) => {
-    console.log("passando 3");
+    if (!isCardDrag(event.dataTransfer)) return;
     event.preventDefault();
+
     const data = JSON.parse(event.dataTransfer.getData("card")) as {
       suit: string;
       rank: number;
@@ -47,26 +53,31 @@ export const PileContainer = ({ color }: CardContainerProps) => {
 
     if (isSuit(data.suit) && Number.isFinite(data.rank)) {
       const card = new Card(data.suit, data.rank);
-      game.move(card, { container: "pile", index: index, innerIndex: 0 });
+      game.move(card, { container: "pile", index, innerIndex: 0 });
       setGame(game.copy());
     }
   };
 
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex gap-2">
       {game.getPiles().map((pile, icol) => (
         <ul
           key={icol}
-          className={`relative flex flex-col items-center justify-center h-48 w-36 border-2 ${bgColor(color)}`}
-          onDragOver={(e) => {
-            e.preventDefault();
-          }}
-          onDrop={(e) => handleDragDropPile(e, icol)}
+          className={`relative flex flex-col h-48 w-36 border-2 rounded-md ${bgColor(color)}`}
+          onDragOver={handleDragOverPile}
+          onDrop={(e) => handleDropPile(e, icol)}
         >
+          {/* área vazia para hitbox */}
+          {pile.getCards().length === 0 && (
+            <li className="h-full w-full opacity-40 flex items-center justify-center text-xs">
+              drop
+            </li>
+          )}
+
           {pile.getCards().map((card, idx) => (
             <li
               key={idx}
-              className="absolute top-1 flex items-center justify-center"
+              className="absolute left-1 top-1"
               draggable
               onDragStart={(e) => handleDragStartFromPile(e, card)}
             >
