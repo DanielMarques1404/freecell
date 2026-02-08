@@ -31,7 +31,7 @@ export class Card {
   }
 
   public toString(): string {
-    return `${this.suit}-[${this.rank}]`
+    return `${this.suit}-${this.rank}`
   }
 
   public getImagePath(): string {

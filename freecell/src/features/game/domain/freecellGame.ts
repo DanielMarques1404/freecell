@@ -44,7 +44,7 @@ export class FreeCellGame {
   }
 
   getCardLocalization(card: Card): CardLocalization {
-    console.log(this.getColumns()[0].getCards(), card)
+    console.log(this.getColumns()[0].getCards(), card);
     for (let i = 0; i < this._guards.length; i++) {
       let idx = this.getGuards()
         [i].getCards()
@@ -62,7 +62,6 @@ export class FreeCellGame {
     }
 
     for (let i = 0; i < this._columns.length; i++) {
-        
       let idx = this.getColumns()
         [i].getCards()
         .findIndex((c) => c?.equals(card));
@@ -74,6 +73,7 @@ export class FreeCellGame {
   }
 
   move(card: Card, destination: CardLocalization): boolean {
+    console.log('passando 1')
     const origin = this.getCardLocalization(card);
     if (
       origin.container === destination.container &&
@@ -82,43 +82,67 @@ export class FreeCellGame {
       return false;
 
     if (origin.container === "column" && destination.container === "guard") {
-        if (!this.getColumns()[origin.index].popRule() || !this.getGuards()[destination.index].addRule(card))
-            return false
-        
-        const popedCard = this.getColumns()[origin.index].pop();
-        if (popedCard) this.getGuards()[destination.index].add(popedCard);
-      
+      const sizeColumn = this.getColumns()[origin.index].getCards().length;
+      const lastCard =
+        this.getColumns()[origin.index].getCards()[sizeColumn - 1];
+      if (
+        !this.getColumns()[origin.index].popRule() ||
+        !this.getGuards()[destination.index].addRule(card) ||
+        (lastCard && !card.equals(lastCard))
+      )
+        return false;
+
+      const popedCard = this.getColumns()[origin.index].pop();
+      if (popedCard) this.getGuards()[destination.index].add(popedCard);
+
       return true;
     }
 
     if (origin.container === "column" && destination.container === "pile") {
-        if (!this.getColumns()[origin.index].popRule() || !this.getPiles()[destination.index].addRule(card))
-            return false
-        
-        const popedCard = this.getColumns()[origin.index].pop();
-        if (popedCard) this.getPiles()[destination.index].add(popedCard);
-      
+      console.log('passando 2')
+      if (
+        !this.getColumns()[origin.index].popRule() ||
+        !this.getPiles()[destination.index].addRule(card)
+      )
+        return false;
+
+      const popedCard = this.getColumns()[origin.index].pop();
+      if (popedCard) this.getPiles()[destination.index].add(popedCard);
+
       return true;
-    }    
+    }
+
+    if (origin.container === "guard" && destination.container === "column") {
+      if (
+        !this.getColumns()[destination.index].addRule(card) ||
+        !this.getGuards()[origin.index].popRule()
+      )
+        return false;
+
+      const popedCard = this.getGuards()[origin.index].pop();
+      if (popedCard) this.getColumns()[destination.index].add(popedCard);
+
+      return true;
+    }
 
     return true;
   }
 
-    // save(): Memento {
-    //   return new GameMemento(this.deepCopyState(this._state));
-    // }
-  
-    // restore(memento: Memento): void {
-    //   this._state = this.deepCopyState(memento.getState());
-  
-    //   this._columns = this._state.columns;
-    //   this._guards = this._state.guards;
-    //   this._piles = this._state.piles;
-  
-    //   console.log(
-    //     `Originator: My state has changed to: ${this._state.guards.getCards()}`,
-    //   );
-    // }
+  // save(): Memento {
+  //   return new GameMemento(this.deepCopyState(this._state));
+  // }
+
+  // restore(memento: Memento): void {
+  //   this._state = this.deepCopyState(memento.getState());
+
+  //   this._columns = this._state.columns;
+  //   this._guards = this._state.guards;
+  //   this._piles = this._state.piles;
+
+  //   console.log(
+  //     `Originator: My state has changed to: ${this._state.guards.getCards()}`,
+  //   );
+  // }
 
   getGuards() {
     return this._guards;
@@ -138,7 +162,7 @@ export class FreeCellGame {
     copiedGame._guards = [...this._guards];
     copiedGame._piles = [...this._piles]; //this._piles.map((pile) => [...pile]);
     copiedGame._columns = [...this._columns]; // this._columns.map((column) => [...column]);
-    console.log(copiedGame)
+    console.log(copiedGame);
     return copiedGame;
   }
 }

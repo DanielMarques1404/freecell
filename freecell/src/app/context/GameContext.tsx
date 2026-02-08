@@ -1,14 +1,12 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
-import { Deck } from "../../core/domain/entities/card";
-import { Game } from "../../core/domain/entities/game-tools";
-import { Caretaker } from "../../core/domain/memento";
+import { FreeCellGame } from "../../features/game/domain/freecellGame";
 
 type GameContextType = {
-  game: Game;
-  caretaker: Caretaker;
-  setGame: (game: Game) => void;
-  backup: () => void;
-  undo: () => void;
+  game: FreeCellGame;
+  // caretaker: Caretaker;
+  setGame: (game: FreeCellGame) => void;
+  // backup: () => void;
+  // undo: () => void;
 };
 
 export const GameContext = createContext<GameContextType | undefined>(
@@ -16,19 +14,19 @@ export const GameContext = createContext<GameContextType | undefined>(
 );
 
 export const GameProvider = ({ children }: { children: ReactNode }) => {
-  const [game, setGame] = useState<Game>(new Game(new Deck(true, false)));
-  const [caretaker, _] = useState<Caretaker>(new Caretaker(game));
+  const [game, setGame] = useState<FreeCellGame>(new FreeCellGame());
+  // const [caretaker, _] = useState<Caretaker>(new Caretaker(game));
 
-  const backup = () => {
-    caretaker.backup()
-  }
+  // const backup = () => {
+  //   caretaker.backup()
+  // }
 
-  const undo = () => {
-    caretaker.undo()
-  }
+  // const undo = () => {
+  //   caretaker.undo()
+  // }
 
   return (
-    <GameContext.Provider value={{ game, caretaker, setGame, backup, undo }}>
+    <GameContext.Provider value={{ game, setGame }}>
       {children}
     </GameContext.Provider>
   );
