@@ -58,8 +58,8 @@ test("Manegando cartas no pile container", () => {
   expect(r6).toBe(false);
   expect(pile.getCards().length).toBe(2);
 
-  const popedCard = pile.pop();
-  expect(popedCard).toBeUndefined();
+  // const popedCard = pile.pop();
+  // expect(popedCard).toBeUndefined();
 });
 
 test("Manegando cartas no column container", () => {

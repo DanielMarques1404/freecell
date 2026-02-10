@@ -75,6 +75,19 @@ export class FreeCellGame {
     return { container: "", index: -1, innerIndex: -1 };
   }
 
+  private getContainer(name: string): Container[] {
+    switch (name) {
+      case "guard":
+        return this.getGuards();
+      case "pile":
+        return this.getPiles();
+      case "column":
+        return this.getColumns();
+      default:
+        return [];
+    }
+  }
+
   move(card: Card, destination: CardLocalization): boolean {
     const origin = this.getCardLocalization(card);
 
@@ -84,107 +97,26 @@ export class FreeCellGame {
     )
       return false;
 
-    if (origin.container === "column" && destination.container === "guard") {
-      const sizeColumn = this.getColumns()[origin.index].getCards().length;
-      const lastCard =
-        this.getColumns()[origin.index].getCards()[sizeColumn - 1];
-      if (
-        !this.getColumns()[origin.index].popRule() ||
-        !this.getGuards()[destination.index].addRule(card) ||
-        (lastCard && !card.equals(lastCard))
-      )
-        return false;
+    if (
+      !this.getContainer(origin.container)[origin.index].popRule() ||
+      !this.getContainer(destination.container)[destination.index].addRule(card)
+    )
+      return false;
 
-      const popedCard = this.getColumns()[origin.index].pop();
-      if (popedCard) this.getGuards()[destination.index].add(popedCard);
+    const popedCard = this.getContainer(origin.container)[origin.index].pop();
+    if (popedCard)
+      this.getContainer(destination.container)[destination.index].add(
+        popedCard,
+      );
 
-      this._moveCounter++;
-      this.automaticMove();
-      return true;
-    }
-
-    if (origin.container === "column" && destination.container === "pile") {
-      if (
-        !this.getColumns()[origin.index].popRule() ||
-        !this.getPiles()[destination.index].addRule(card)
-      )
-        return false;
-
-      const popedCard = this.getColumns()[origin.index].pop();
-      if (popedCard) this.getPiles()[destination.index].add(popedCard);
-
-      this._moveCounter++;
-      this.automaticMove();
-      return true;
-    }
-
-    if (origin.container === "column" && destination.container === "column") {
-      if (
-        !this.getColumns()[origin.index].popRule() ||
-        !this.getColumns()[destination.index].addRule(card)
-      )
-        return false;
-
-      const popedCard = this.getColumns()[origin.index].pop();
-      if (popedCard) this.getColumns()[destination.index].add(popedCard);
-
-      this._moveCounter++;
-      this.automaticMove();
-      return true;
-    }
-
-    if (origin.container === "guard" && destination.container === "column") {
-      if (
-        !this.getColumns()[destination.index].addRule(card) ||
-        !this.getGuards()[origin.index].popRule()
-      )
-        return false;
-
-      const popedCard = this.getGuards()[origin.index].pop();
-      if (popedCard) this.getColumns()[destination.index].add(popedCard);
-
-      this._moveCounter++;
-      this.automaticMove();
-      return true;
-    }
-
-    if (origin.container === "guard" && destination.container === "pile") {
-      if (
-        !this.getPiles()[destination.index].addRule(card) ||
-        !this.getGuards()[origin.index].popRule()
-      )
-        return false;
-
-      const popedCard = this.getGuards()[origin.index].pop();
-      if (popedCard) this.getPiles()[destination.index].add(popedCard);
-
-      this._moveCounter++;
-      this.automaticMove();
-      return true;
-    }
-
-    if (origin.container === "pile" && destination.container === "column") {
-      if (
-        !this.getColumns()[destination.index].addRule(card) ||
-        !this.getPiles()[origin.index].popRule()
-      )
-        return false;
-
-      const popedCard = this.getPiles()[origin.index].pop();
-      if (popedCard) this.getColumns()[destination.index].add(popedCard);
-
-      this._moveCounter--;
-      this.automaticMove();
-      return true;
-    }
-
-    return false;
+    this._moveCounter++;
+    this.automaticMove();
+    return true;
   }
 
-  automaticMove() {
-    console.log('1')
-    if (!this.getAutoMove()) return
-    console.log('2')
+  private automaticMove() {
+    if (!this.getAutoMove()) return;
+
     let hasMoves = true;
     const lastGuardsCards: (Card | undefined)[] = this.getGuards().map(
       (guard) => guard.getCards().at(-1),
@@ -241,7 +173,7 @@ export class FreeCellGame {
   }
 
   setAutoMove(value: boolean) {
-    this._autoMove = value
+    this._autoMove = value;
   }
 
   getGuards() {
