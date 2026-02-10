@@ -78,7 +78,7 @@ export class PileContainer extends Container {
   }
 
   public popRule(): boolean {
-    return false;
+    return true;
   }
 }
 

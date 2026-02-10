@@ -19,13 +19,15 @@ export class FreeCellGame {
   private _columns: Container[];
   private _deck: Deck;
   private _moveCounter: number;
+  private _autoMove: boolean;
 
   constructor() {
     this._guards = [];
     this._piles = [];
     this._columns = [];
     this._deck = new Deck(true);
-    this._moveCounter = 0
+    this._moveCounter = 0;
+    this._autoMove = false;
 
     for (let g = 0; g < 4; g++) {
       this._guards.push(new GuardContainer());
@@ -97,7 +99,7 @@ export class FreeCellGame {
       if (popedCard) this.getGuards()[destination.index].add(popedCard);
 
       this._moveCounter++;
-      this.automaticMove()
+      this.automaticMove();
       return true;
     }
 
@@ -111,8 +113,8 @@ export class FreeCellGame {
       const popedCard = this.getColumns()[origin.index].pop();
       if (popedCard) this.getPiles()[destination.index].add(popedCard);
 
-      this._moveCounter++
-      this.automaticMove()
+      this._moveCounter++;
+      this.automaticMove();
       return true;
     }
 
@@ -126,8 +128,8 @@ export class FreeCellGame {
       const popedCard = this.getColumns()[origin.index].pop();
       if (popedCard) this.getColumns()[destination.index].add(popedCard);
 
-      this._moveCounter++
-      this.automaticMove()
+      this._moveCounter++;
+      this.automaticMove();
       return true;
     }
 
@@ -141,8 +143,8 @@ export class FreeCellGame {
       const popedCard = this.getGuards()[origin.index].pop();
       if (popedCard) this.getColumns()[destination.index].add(popedCard);
 
-      this._moveCounter++
-      this.automaticMove()
+      this._moveCounter++;
+      this.automaticMove();
       return true;
     }
 
@@ -156,8 +158,23 @@ export class FreeCellGame {
       const popedCard = this.getGuards()[origin.index].pop();
       if (popedCard) this.getPiles()[destination.index].add(popedCard);
 
-      this._moveCounter++
-      this.automaticMove()
+      this._moveCounter++;
+      this.automaticMove();
+      return true;
+    }
+
+    if (origin.container === "pile" && destination.container === "column") {
+      if (
+        !this.getColumns()[destination.index].addRule(card) ||
+        !this.getPiles()[origin.index].popRule()
+      )
+        return false;
+
+      const popedCard = this.getPiles()[origin.index].pop();
+      if (popedCard) this.getColumns()[destination.index].add(popedCard);
+
+      this._moveCounter--;
+      this.automaticMove();
       return true;
     }
 
@@ -165,24 +182,38 @@ export class FreeCellGame {
   }
 
   automaticMove() {
+    console.log('1')
+    if (!this.getAutoMove()) return
+    console.log('2')
     let hasMoves = true;
-    // const lastPilesCards: (Card | undefined)[] = this.getPiles().map(pile => pile.getCards().at(-1))
-    const lastGuardsCards: (Card | undefined)[] = this.getGuards().map(guard => guard.getCards().at(-1))
-    const lastColumnsCards: (Card | undefined)[] = this.getColumns().map(column => column.getCards().at(-1))
+    const lastGuardsCards: (Card | undefined)[] = this.getGuards().map(
+      (guard) => guard.getCards().at(-1),
+    );
+    const lastColumnsCards: (Card | undefined)[] = this.getColumns().map(
+      (column) => column.getCards().at(-1),
+    );
 
     while (hasMoves) {
-      hasMoves = false
+      hasMoves = false;
       for (const guard of lastGuardsCards) {
         if (guard) {
           for (let p = 0; p < this.getPiles().length; p++) {
-            hasMoves = this.move(guard, {container: "pile", index: p, innerIndex: 0})
+            hasMoves = this.move(guard, {
+              container: "pile",
+              index: p,
+              innerIndex: 0,
+            });
           }
         }
       }
       for (const column of lastColumnsCards) {
         if (column) {
           for (let p = 0; p < this.getPiles().length; p++) {
-            hasMoves = this.move(column, {container: "pile", index: p, innerIndex: 0})
+            hasMoves = this.move(column, {
+              container: "pile",
+              index: p,
+              innerIndex: 0,
+            });
           }
         }
       }
@@ -205,6 +236,14 @@ export class FreeCellGame {
   //   );
   // }
 
+  getAutoMove() {
+    return this._autoMove;
+  }
+
+  setAutoMove(value: boolean) {
+    this._autoMove = value
+  }
+
   getGuards() {
     return this._guards;
   }
@@ -224,10 +263,11 @@ export class FreeCellGame {
   copy(): FreeCellGame {
     const copiedGame = Object.create(FreeCellGame.prototype);
     copiedGame._deck = this._deck;
-    copiedGame._guards = [...this._guards];
-    copiedGame._piles = [...this._piles]; //this._piles.map((pile) => [...pile]);
-    copiedGame._columns = [...this._columns]; // this._columns.map((column) => [...column]);
-    copiedGame._moveCounter = this._moveCounter;
+    copiedGame._guards = [...this.getGuards()];
+    copiedGame._piles = [...this.getPiles()]; //this._piles.map((pile) => [...pile]);
+    copiedGame._columns = [...this.getColumns()]; // this._columns.map((column) => [...column]);
+    copiedGame._moveCounter = this.getMovesCounter();
+    copiedGame._autoMove = this.getAutoMove();
     return copiedGame;
   }
 }
