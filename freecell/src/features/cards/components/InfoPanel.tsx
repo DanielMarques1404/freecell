@@ -16,7 +16,7 @@ export const InfoPanel = () => {
     }
 
     return (
-        <div className="flex items-center justify-between text-3xl text-white font-bold p-1">
+        <div className="flex items-center justify-between text-2xl text-white font-bold p-1">
             <span>{`Moves: ${game.getMovesCounter()}`}</span>
             <span className="flex gap-2 items-center justify-center">
                 <label htmlFor="autoMoveCheck">Auto Move</label>

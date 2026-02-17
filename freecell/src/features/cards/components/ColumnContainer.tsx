@@ -84,7 +84,7 @@ export const ColumnContainer = ({ color }: CardContainerProps) => {
             <li
               key={idx}
               className="absolute flex items-center justify-center p-1 left-0"
-              style={{ top: `${idx * 36}px` }}
+              style={{ top: `${idx * (36 - Math.floor(idx/10))}px` }}
               draggable
               onDragStart={(e) => handleDragStartFromColumn(e, card)}
             >
