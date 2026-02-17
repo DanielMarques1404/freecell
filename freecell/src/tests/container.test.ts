@@ -1,4 +1,3 @@
-import { useGame } from "../app/context/GameContext";
 import { Card } from "../features/cards/domain/card";
 import {
   ColumnContainer,

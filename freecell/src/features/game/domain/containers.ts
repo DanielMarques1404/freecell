@@ -63,7 +63,7 @@ export class GuardContainer extends Container {
     super("guard", initialCards, 1);
   }
 
-  public addRule(card: Card): boolean {
+  public addRule(_card: Card): boolean {
     if (this.getCards().length >= this.getMaxLenght()) return false;
     return true;
   }
