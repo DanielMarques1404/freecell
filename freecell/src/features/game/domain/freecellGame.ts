@@ -6,12 +6,19 @@ import {
   PileContainer,
   type ContainerNames,
 } from "./containers";
+import { GameMemento, type Memento } from "./memento";
 
 export type CardLocalization = {
   container: ContainerNames;
   index: number;
   innerIndex: number;
 };
+
+export interface GameState {
+  guards: Container[];
+  piles: Container[];
+  columns: Container[];
+}
 
 export class FreeCellGame {
   private _guards: Container[];
@@ -88,6 +95,17 @@ export class FreeCellGame {
     }
   }
 
+  canMove(
+    card: Card,
+    origin: CardLocalization,
+    destination: CardLocalization,
+  ): boolean {
+    return (
+      this.getContainer(origin.container)[origin.index].popRule() &&
+      this.getContainer(destination.container)[destination.index].addRule(card)
+    );
+  }
+
   move(card: Card, destination: CardLocalization): boolean {
     const origin = this.getCardLocalization(card);
 
@@ -97,11 +115,7 @@ export class FreeCellGame {
     )
       return false;
 
-    if (
-      !this.getContainer(origin.container)[origin.index].popRule() ||
-      !this.getContainer(destination.container)[destination.index].addRule(card)
-    )
-      return false;
+    if (!this.canMove(card, origin, destination)) return false;
 
     const popedCard = this.getContainer(origin.container)[origin.index].pop();
     if (popedCard)
@@ -152,21 +166,17 @@ export class FreeCellGame {
     }
   }
 
-  // save(): Memento {
-  //   return new GameMemento(this.deepCopyState(this._state));
-  // }
+  save(): Memento {
+    return new GameMemento(this.getState());
+  }
 
-  // restore(memento: Memento): void {
-  //   this._state = this.deepCopyState(memento.getState());
-
-  //   this._columns = this._state.columns;
-  //   this._guards = this._state.guards;
-  //   this._piles = this._state.piles;
-
-  //   console.log(
-  //     `Originator: My state has changed to: ${this._state.guards.getCards()}`,
-  //   );
-  // }
+  restore(memento: Memento): void {
+    const s = memento.getState();
+    this._columns = s.columns;
+    this._guards = s.guards;
+    this._piles = s.piles;
+    this._moveCounter--;
+  }
 
   getAutoMove() {
     return this._autoMove;
@@ -192,14 +202,42 @@ export class FreeCellGame {
     return this._moveCounter;
   }
 
+  getState(): GameState {
+    return {
+      columns: this.getColumns().map((c) => c.clone()),
+      guards: this.getGuards().map((g) => g.clone()),
+      piles: this.getPiles().map((p) => p.clone()),
+    };
+  }
+
+  private cloneContainers(list: Container[]): Container[] {
+    return list.map((c) => {
+      const cloned = new (c.constructor as { new (): Container })();
+      for (const card of c.getCards()) {
+        cloned.getCards().push(card ? card.clone() : undefined);
+      }
+      return cloned;
+    });
+  }
+
   copy(): FreeCellGame {
-    const copiedGame = Object.create(FreeCellGame.prototype);
+    const copiedGame = Object.create(FreeCellGame.prototype) as FreeCellGame;
+
     copiedGame._deck = this._deck;
-    copiedGame._guards = [...this.getGuards()];
-    copiedGame._piles = [...this.getPiles()]; //this._piles.map((pile) => [...pile]);
-    copiedGame._columns = [...this.getColumns()]; // this._columns.map((column) => [...column]);
+    copiedGame._guards = this.cloneContainers(this.getGuards());
+    copiedGame._piles = this.cloneContainers(this.getPiles());
+    copiedGame._columns = this.cloneContainers(this.getColumns());
     copiedGame._moveCounter = this.getMovesCounter();
     copiedGame._autoMove = this.getAutoMove();
+
     return copiedGame;
+  }
+
+  toString() {
+    return {
+      guards: this.getState().guards.toString(),
+      piles: this.getState().piles.toString(),
+      columns: this.getState().columns.map(c => c.toString())
+    };
   }
 }

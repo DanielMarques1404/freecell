@@ -1,10 +1,12 @@
-import { Card } from "../core/domain/entities/card";
+import { useGame } from "../app/context/GameContext";
+import { Card } from "../features/cards/domain/card";
 import {
   ColumnContainer,
   GuardContainer,
   PileContainer,
 } from "../features/game/domain/containers";
 import { FreeCellGame } from "../features/game/domain/freecellGame";
+import { Caretaker } from "../features/game/domain/memento";
 
 test("Manegando cartas no guard container", () => {
   const gc = new GuardContainer();
@@ -135,28 +137,49 @@ test("Testando estado inicial do FreeCellGame", () => {
 });
 
 test("Localizando a posição de uma carta", () => {
-  const game = new FreeCellGame()
-  const card = new Card("diamonds", 2)
-  const localization = game.getCardLocalization(card)
+  const game = new FreeCellGame();
+  const card = new Card("diamonds", 2);
+  const localization = game.getCardLocalization(card);
 
-  expect(localization.container === "guard").toBe(false)
-  expect(localization.container === "pile").toBe(false)
-  expect(localization.container === "column").toBe(true)
-})
+  expect(localization.container === "guard").toBe(false);
+  expect(localization.container === "pile").toBe(false);
+  expect(localization.container === "column").toBe(true);
+});
 
 test("Movendo uma carta", () => {
-  const game = new FreeCellGame()
-  const card = game.getColumns()[0].getCards()[6]
-  const r1 = game.move(card!, {container: "guard", index: 0, innerIndex: 0})
-  expect(r1).toBe(true)
+  const game = new FreeCellGame();
+  const card = game.getColumns()[0].getCards()[6];
+  const r1 = game.move(card!, { container: "guard", index: 0, innerIndex: 0 });
+  expect(r1).toBe(true);
 
-  // const r1 = game.getColumns()[0].pop()
-  // expect(game.getColumns()[0].getCards().length).toBe(6)
-  // expect(game.getGuards()[0].getCards().length).toBe(0)
-  // const r2 = game.getGuards()[0].add(r1!)
-  // expect(r2).toBe(true)
-  // expect(game.getGuards()[0].getCards().length).toBe(1)
+  expect(game.getColumns()[0].getCards().length).toBe(6);
+  expect(game.getGuards()[0].getCards()[0]?.equals(card!)).toBe(true);
+});
 
-  expect(game.getColumns()[0].getCards().length).toBe(6)
-  expect(game.getGuards()[0].getCards()[0]?.equals(card!)).toBe(true)
-})
+test("Testando backup/undo game", () => {
+  const game = new FreeCellGame();
+  const caretaker = new Caretaker(game);
+
+  expect(game.getGuards()[0].getCards().length).toBe(0);
+  expect(game.getColumns()[0].getCards().length).toBe(7);
+  expect(caretaker.getMementos().length).toBe(0)
+  caretaker.backup();
+  expect(game.getGuards()[0].getCards().length).toBe(0);
+  expect(game.getColumns()[0].getCards().length).toBe(7);
+
+  const firstCard = game.getColumns()[0].getCards()[0];
+  expect(
+    game.move(firstCard!, { container: "guard", index: 0, innerIndex: 0 }),
+  );
+  expect(game.getGuards()[0].getCards().length).toBe(1);
+  expect(game.getColumns()[0].getCards().length).toBe(6);
+
+  // expect(caretaker.getMementos().length).toBe(1)
+  // expect(caretaker.getMementos()[0].getState().guards[0].getCards().length).toBe(0)
+
+  caretaker.undo();
+  expect(caretaker.getMementos().length).toBe(0)
+  expect(game.getGuards()[0].getCards().length).toBe(0);
+  expect(game.getColumns()[0].getCards().length).toBe(7);
+});
+

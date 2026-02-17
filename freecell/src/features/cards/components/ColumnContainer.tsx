@@ -1,4 +1,5 @@
 import { useGame } from "../../../app/context/GameContext";
+import type { CardLocalization } from "../../game/domain/freecellGame";
 import { Card } from "../domain/card";
 import { bgColor, type CardContainerProps } from "../types";
 import { CardImage } from "./Card";
@@ -17,7 +18,7 @@ function isSuit(x: string): x is Suit {
 }
 
 export const ColumnContainer = ({ color }: CardContainerProps) => {
-  const { game, setGame } = useGame();
+  const { game, move } = useGame();
 
   const handleDragStartFromColumn = (
     event: React.DragEvent<HTMLLIElement>,
@@ -53,8 +54,13 @@ export const ColumnContainer = ({ color }: CardContainerProps) => {
 
     if (isSuit(data.suit) && Number.isFinite(data.rank)) {
       const card = new Card(data.suit, data.rank);
-      game.move(card, { container: "column", index, innerIndex: 0 });
-      setGame(game.copy());
+      const destination: CardLocalization = {
+        container: "column",
+        index: index,
+        innerIndex: 0,
+      };
+
+      move(card, destination)
     }
   };
 

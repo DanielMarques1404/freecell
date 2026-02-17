@@ -17,7 +17,7 @@ function isSuit(x: string): x is Suit {
 }
 
 export const GuardContainer = ({ color }: CardContainerProps) => {
-  const { game, setGame } = useGame();
+  const { game, move } = useGame();
 
   const handleDragOverGuard = (event: React.DragEvent<HTMLLIElement>) => {
     if (!isCardDrag(event.dataTransfer)) return;
@@ -39,8 +39,7 @@ export const GuardContainer = ({ color }: CardContainerProps) => {
 
     if (isSuit(data.suit) && Number.isFinite(data.rank)) {
       const card = new Card(data.suit, data.rank);
-      game.move(card, { container: "guard", index, innerIndex: 0 });
-      setGame(game.copy());
+      move(card,  { container: "guard", index, innerIndex: 0 })
     }
   };
 

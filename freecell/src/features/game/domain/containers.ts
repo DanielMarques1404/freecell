@@ -40,6 +40,21 @@ export abstract class Container {
   getMaxLenght() {
     return this._maxLenght;
   }
+
+  toString() {
+    let c = this.getCards().map(c => c?.toString())
+    return c.join('|')
+  }
+
+  clone(): Container {
+    const cloned = new (this.constructor as { new (): Container })();
+
+    for (const c of this.getCards()) {
+      cloned.getCards().push(c ? c.clone() : undefined);
+    }
+
+    return cloned;
+  }  
 }
 
 export class GuardContainer extends Container {

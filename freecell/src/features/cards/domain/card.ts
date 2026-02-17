@@ -19,22 +19,59 @@ export class Card {
     }
   }
 
-  public compareTo(other: Card): number {
+  compareTo(other: Card): number {
     if (this.rank !== other.rank) {
       return this.rank - other.rank;
     }
     return 0;
   }
 
-  public equals(other: Card): boolean {
+  equals(other: Card): boolean {
     return this.suit === other?.suit && this.rank === other?.rank;
   }
 
-  public toString(): string {
-    return `${this.suit}-${this.rank}`
+  clone(): Card {
+    return new Card(this.suit, this.rank, this.folded);
   }
 
-  public getImagePath(): string {
+  convertSuit(suit: string): string {
+    switch (suit) {
+      case "diamonds":
+        return "♢"
+      case "hearts":
+        return "♡"
+      case "spades":
+        return "♠"
+      case "clubs":
+        return "♣"
+    
+      default:
+        return "";
+    }
+  }
+
+  convertRank(rank: number): string {
+    if (rank !== 1 && rank < 11) return rank.toString()
+    switch (rank) {
+      case 1:
+        return "A"
+      case 11:
+        return "J"
+      case 12:
+        return "Q"
+      case 13:
+        return "K"
+    
+      default:
+        return ""
+    }
+  }
+
+  toString(): string {
+    return `${this.convertRank(this.rank)}${this.convertSuit(this.suit)}`
+  }
+
+  getImagePath(): string {
     if (this.folded) {
       return "./cards/card_back_red.png";
     }

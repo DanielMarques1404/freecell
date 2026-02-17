@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { useGame } from "../../../app/context/GameContext";
+import { ToggleButton } from "../../../components/ui/Toggle";
 
 export const InfoPanel = () => {
-    const { game, setGame } = useGame();
-    const [autoMove, setAutoMove] = useState(game.getAutoMove());
+    const { game, setAutoMove, undo } = useGame();
+    const [autoMoveCheck, setAutoMoveCheck] = useState(false);
 
     const handleChangeAutoMove = () => {
-        console.log('3')
-        setAutoMove(!autoMove)
-        game.setAutoMove(!autoMove)
-        setGame(game.copy())
+        setAutoMove(!autoMoveCheck)
+        setAutoMoveCheck(!autoMoveCheck)
+    }
+
+    const handleUndo = () => {
+        undo()
     }
 
     return (
@@ -17,8 +20,9 @@ export const InfoPanel = () => {
             <span>{`Moves: ${game.getMovesCounter()}`}</span>
             <span className="flex gap-2 items-center justify-center">
                 <label htmlFor="autoMoveCheck">Auto Move</label>
-                <input id="autoMoveCheck" type="checkbox" checked={autoMove} onChange={handleChangeAutoMove}/>
+                <ToggleButton toggle={handleChangeAutoMove} state={autoMoveCheck}/>
             </span>
+            <button className="border-2 rounded-2xl px-3 cursor-pointer" onClick={handleUndo}>Undo</button>
             <span>Time</span>
         </div>
     );
